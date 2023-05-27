@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,6 +28,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (((exchange, chain) -> {
+            ServerHttpRequest loggedInUserToken = null;
             if(validator.isSecured.test(exchange.getRequest())){
                 //check if header contains token or not
                 if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)){
@@ -41,12 +43,18 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 //                    String forObject = restTemplate.getForObject("http://localhost:9898/auth/validate?token" + authHeader, String.class);
 //                    template.getForObject("http://IDENTITY-SERVICE//validate?token" + authHeader, String.class);
                     jwtUtil.validateToken(authHeader);
+
+                     loggedInUserToken = exchange.getRequest()
+                            .mutate()
+                            .header("loggedInUserToken", authHeader)
+                            .build();
+
                 }catch (Exception e){
                     System.out.println("Invalid Token !!");
                     throw new RuntimeException("Invalid Token !!");
                 }
             }
-            return chain.filter(exchange);
+            return chain.filter(exchange.mutate().request(loggedInUserToken).build());
         }));
     }
 

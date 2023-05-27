@@ -3,10 +3,7 @@ package com.javatechie.controller;
 import com.javatechie.dto.OrderResponseDTO;
 import com.javatechie.service.SwiggyAppService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/swiggy")
@@ -21,7 +18,8 @@ public class SwiggyAppController {
     }
 
     @GetMapping("/{orderId}")
-    public OrderResponseDTO checkOrderStatus(@PathVariable String orderId) {
+    public OrderResponseDTO checkOrderStatus(@PathVariable String orderId, @RequestHeader("loggedInUserToken") String token) {
+        System.out.println("JWT Token : " + token);
         return service.checkOrderStatus(orderId);
     }
 }

@@ -15,4 +15,5 @@ public class RestaurantServiceClient {
     public OrderResponseDTO fetchOrderStatus(String orderId) {
         return template.getForObject("http://RESTAURANT-SERVICE/restaurant/orders/status/" + orderId, OrderResponseDTO.class);
     }
+
 }
