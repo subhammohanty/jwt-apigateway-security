@@ -2,6 +2,7 @@ package com.javatechie.service;
 
 import com.javatechie.dao.RestaurantOrderDAO;
 import com.javatechie.dto.OrderResponseDTO;
+import com.javatechie.exception.OrderNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,11 @@ public class RestaurantService {
     }
 
     public OrderResponseDTO getOrder(String orderId) {
-        return orderDAO.getOrders(orderId);
+        OrderResponseDTO orderResponseDTO = orderDAO.getOrders(orderId);
+        if (orderResponseDTO != null){
+            return orderResponseDTO;
+        }else{
+            throw new OrderNotFoundException("Order Not Found with Id : "+ orderId);
+        }
     }
 }
